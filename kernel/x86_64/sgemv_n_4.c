@@ -35,8 +35,28 @@ USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "sgemv_n_microk_nehalem-4.c"
 #elif defined(SANDYBRIDGE)
 #include "sgemv_n_microk_sandy-4.c"
-#elif defined(HASWELL) || defined(ZEN) || defined (SKYLAKEX) || defined (COOPERLAKE)
+#elif defined(HASWELL) || defined(ZEN) 
 #include "sgemv_n_microk_haswell-4.c"
+#elif defined (SKYLAKEX) || defined (COOPERLAKE)
+#include "sgemv_n_microk_haswell-4.c"
+#include "sgemv_n_microk_skylakex.c"
+#define ALIGN64_ALLOC(alloc_size, ptr_align, ptr)   \
+    ptr = (float *) malloc(sizeof(float)*alloc_size + 63); \
+    ptr_align = ((int)(((uintptr_t)ptr & (uintptr_t)0x3F))!=0) ? (float *)((char *)ptr + (64 - (int)((uintptr_t)ptr & (uintptr_t)0x3F))) : ptr
+#define ALIGN64_FREE(ptr) \
+    free(ptr)
+static void float_compress_vector(BLASLONG n, float * src, float * target, BLASLONG inc)
+{
+    for(BLASLONG i=0; i<n; i++) {
+        target[i] = src[i*inc];
+    }
+}
+static void float_expand_vector(BLASLONG n, float * src, float * target, BLASLONG inc)
+{
+    for(BLASLONG i=0; i<n; i++) {
+        target[i*inc] = src[i];
+    }
+}
 #endif
 
 #if defined(STEAMROLLER)  || defined(EXCAVATOR)
@@ -305,8 +325,42 @@ int CNAME(BLASLONG m, BLASLONG n, BLASLONG dummy1, FLOAT alpha, FLOAT *a, BLASLO
 	BLASLONG lda8 =  lda << 3;
 	FLOAT xbuffer[8],*ybuffer;
 
-        if ( m < 1 ) return(0);
-        if ( n < 1 ) return(0);
+    if ( m < 1 ) return(0);
+    if ( n < 1 ) return(0);
+
+	#ifdef HAVE_SGEMV_N_SKYLAKE_KERNEL
+	if (m <= 16384 && n <= 48 && !(n == 4 && m >=1500)) 
+	{
+		FLOAT * xbuffer_align = x;
+    	FLOAT * ybuffer_align = y;
+
+    	FLOAT * xbuffer = NULL;
+    	FLOAT * ybuffer = NULL;
+
+    	if (inc_x != 1) {
+        	ALIGN64_ALLOC(n, xbuffer_align, xbuffer);
+        	float_compress_vector(n, x, xbuffer_align, inc_x);
+    	}
+
+    	if (inc_y != 1) {
+        	ALIGN64_ALLOC(m, ybuffer_align, ybuffer);
+        	float_compress_vector(m, y, ybuffer_align, inc_y);
+    	}
+
+		sgemv_kernel_small_n(m, n , alpha, a, lda, xbuffer_align, ybuffer_align);
+		
+		if(inc_x != 1) {
+    		ALIGN64_FREE(xbuffer);
+    	}
+
+	    if(inc_y != 1) {
+	        float_expand_vector(m, ybuffer_align, y, inc_y);
+	        ALIGN64_FREE(ybuffer);
+	    }
+		return(0);
+	}
+
+	#endif
 
 	ybuffer = buffer;
 	
