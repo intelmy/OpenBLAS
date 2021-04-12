@@ -30,3 +30,4 @@ ZSCALKERNEL    = ../arm/zscal.c
 
 CASUMKERNEL = casum.c
 ZASUMKERNEL = zasum.c
+SGEMVNKERNEL = sgemv_n_16.c
