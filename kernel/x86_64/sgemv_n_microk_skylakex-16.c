@@ -82,14 +82,6 @@ static int sgemv_kernel_n(BLASLONG m, BLASLONG n, float alpha, float *a, BLASLON
             accum512_7 = _mm512_fmadd_ps(matrixArray_7, xArray_0, accum512_7);
         }
 
-        //accum512_0 = _mm512_add_ps(accum512_0, _mm512_loadu_ps(&y[idx_m + 0]));
-        //accum512_1 = _mm512_add_ps(accum512_1, _mm512_loadu_ps(&y[idx_m + 16]));
-        //accum512_2 = _mm512_add_ps(accum512_2, _mm512_loadu_ps(&y[idx_m + 32]));
-        //accum512_3 = _mm512_add_ps(accum512_3, _mm512_loadu_ps(&y[idx_m + 48]));
-        //accum512_4 = _mm512_add_ps(accum512_4, _mm512_loadu_ps(&y[idx_m + 64]));
-        //accum512_5 = _mm512_add_ps(accum512_5, _mm512_loadu_ps(&y[idx_m + 80]));
-        //accum512_6 = _mm512_add_ps(accum512_6, _mm512_loadu_ps(&y[idx_m + 96]));
-        //accum512_7 = _mm512_add_ps(accum512_7, _mm512_loadu_ps(&y[idx_m + 112]));
         _mm512_storeu_ps(&y[idx_m + 0], _mm512_fmadd_ps(accum512_0, ALPHAVECTOR, _mm512_loadu_ps(&y[idx_m + 0])));
         _mm512_storeu_ps(&y[idx_m + 16], _mm512_fmadd_ps(accum512_1, ALPHAVECTOR, _mm512_loadu_ps(&y[idx_m + 16])));
         _mm512_storeu_ps(&y[idx_m + 32], _mm512_fmadd_ps(accum512_2, ALPHAVECTOR, _mm512_loadu_ps(&y[idx_m + 32])));
