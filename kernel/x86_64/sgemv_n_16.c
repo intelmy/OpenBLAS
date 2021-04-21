@@ -306,6 +306,7 @@ int CNAME(BLASLONG m, BLASLONG n, BLASLONG dummy1, FLOAT alpha, FLOAT *a, BLASLO
 	BLASLONG n2, n3;
 	BLASLONG lda4 =  lda << 2;
 	BLASLONG lda8 =  lda << 3;
+	BLASLONG lda16 = lda << 4;
 	FLOAT xbuffer[8],*ybuffer;
 
         if ( m < 1 ) return(0);
@@ -315,8 +316,8 @@ int CNAME(BLASLONG m, BLASLONG n, BLASLONG dummy1, FLOAT alpha, FLOAT *a, BLASLO
 	
         if ( inc_x == 1 )
 	{
-		n1 = n >> 6 ;
-		n2 = (n - (n1 << 6)) >> 3;
+		n1 = n >> 4 ;
+		n2 = (n - (n1 << 4)) >> 3;
 		n3 = n &  7 ;
 	}
 	else
@@ -357,9 +358,9 @@ int CNAME(BLASLONG m, BLASLONG n, BLASLONG dummy1, FLOAT alpha, FLOAT *a, BLASLO
 		{
 			for( i = 0; i < n1 ; i++)
 			{
-				sgemv_kernel_n(NB, 64, alpha, a_ptr, lda, x_ptr, ybuffer);
-				a_ptr += lda8;
-				x_ptr += 8;	
+				sgemv_kernel_n(NB, 16, alpha, a_ptr, lda, x_ptr, ybuffer);
+				a_ptr += lda16;
+				x_ptr += 16;	
 			}
 			for( i = 0; i < n2 ; i++)
 			{
