@@ -377,8 +377,10 @@ int CNAME(BLASLONG m, BLASLONG n, BLASLONG dummy1, FLOAT alpha, FLOAT *a, BLASLO
 			//	a_ptr += lda8;
 			//	x_ptr += 8;	
 			//}
+			//printf("start to compute \n");
 			for( i = 0; i < n1 ; i++)
 			{
+				//printf("start 8\n");
 				sgemv_kernel_n(NB, 8, alpha, a_ptr, lda, x_ptr, ybuffer);
 				a_ptr += lda8;
 				x_ptr += 8;	
@@ -395,6 +397,7 @@ int CNAME(BLASLONG m, BLASLONG n, BLASLONG dummy1, FLOAT alpha, FLOAT *a, BLASLO
 			//}
 			if ( n3 & 4 )
 			{
+				//printf("start 4\n");
 				sgemv_kernel_n(NB, 4, alpha, a_ptr, lda, x_ptr, ybuffer);
 				a_ptr += lda4;
 				x_ptr += 4;	
@@ -402,6 +405,7 @@ int CNAME(BLASLONG m, BLASLONG n, BLASLONG dummy1, FLOAT alpha, FLOAT *a, BLASLO
 
 			if ( n3 & 2 )
 			{
+				//printf("start 2\n");
 				sgemv_kernel_n(NB, 2, alpha, a_ptr, lda, x_ptr, ybuffer);
 				a_ptr += lda*2;
 				x_ptr += 2;	
@@ -409,6 +413,7 @@ int CNAME(BLASLONG m, BLASLONG n, BLASLONG dummy1, FLOAT alpha, FLOAT *a, BLASLO
 
 			if ( n3 & 1 )
 			{
+				//printf("start 1\n");
 				sgemv_kernel_n(NB, 1, alpha, a_ptr, lda, x_ptr, ybuffer);
 				/* a_ptr += lda;
 				x_ptr += 1a; */

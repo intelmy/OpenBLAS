@@ -36,15 +36,15 @@ USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
                             : "=v" (zmm)               \
                             : "r"  (addr) )
 
-#define _VFMADD231_PS_MUL_ADDR(ymm1, ymm2, addr)          \
-                    __asm__ ("vfmadd231ps %0, %1, (%2);"  \
-                            : "=v" (ymm1)                 \
-                            : "v"  (ymm2), "r" (addr) )
+#define _VFMADD231_PS_MUL_ADDR(kmask, ymm1, ymm2, addr)          \
+                    __asm__ ("vfmadd231ps (%2), %1, %0;"  \
+                            : "+v" (ymm1)                 \
+                            : "v"  (ymm2), "r" (addr), "r" (kmask) )
 
-#define _VFMADD213_PS_ADD_ADDR(ymm1, ymm2, addr)          \
-                    __asm__ ("vfmadd213ps %0, %1, (%2);"  \
-                            : "=v" (ymm1), "v" (ymm2)     \
-                            : "r"  (addr) )               
+#define _VFMADD213_PS_ADD_ADDR(kmask, ymm1, ymm2, addr)          \
+                    __asm__ ("vfmadd213ps (%2), %1, %0;"  \
+                            : "+v" (ymm1)                 \
+                            : "v" (ymm2), "r"  (addr), "r" (kmask) )               
 
 // Define micro kernels for ALPHA not ONE && BETA as ONE scenarios
 static int sgemv_kernel_n(BLASLONG m, BLASLONG n, float alpha, float *a, BLASLONG lda, float *x, float *y)
@@ -154,11 +154,13 @@ static int sgemv_kernel_n(BLASLONG m, BLASLONG n, float alpha, float *a, BLASLON
     
                 for (BLASLONG idx_n = 0; idx_n < n; idx_n++) {
                     xv = _mm256_set1_ps(x[idx_n]);
-                    ma6 = _mm256_maskz_loadu_ps(one_mask, &a[idx_n * lda + idx_m]);
-    
-                    as6 = _mm256_maskz_fmadd_ps(one_mask, ma6, xv, as6);
+                    //ma6 = _mm256_maskz_loadu_ps(one_mask, &a[idx_n * lda + idx_m]);
+                    _VFMADD231_PS_MUL_ADDR(one_mask, as6, xv, &a[idx_n * lda + idx_m]);
+                    //as6 = _mm256_maskz_fmadd_ps(one_mask, ma6, xv, as6);
                 }
-                _mm256_mask_storeu_ps(&y[idx_m], one_mask, _mm256_maskz_fmadd_ps(one_mask, as6, alphav, _mm256_maskz_loadu_ps(one_mask, &y[idx_m])));
+                //_mm256_mask_storeu_ps(&y[idx_m], one_mask, _mm256_maskz_fmadd_ps(one_mask, as6, alphav, _mm256_maskz_loadu_ps(one_mask, &y[idx_m])));
+                _VFMADD213_PS_ADD_ADDR(one_mask, as6, alphav, &y[idx_m]);
+                _mm256_mask_storeu_ps(&y[idx_m], one_mask, as6);
             }
         
             if (tag_m_8x != m) {
@@ -170,12 +172,14 @@ static int sgemv_kernel_n(BLASLONG m, BLASLONG n, float alpha, float *a, BLASLON
     
                 for(BLASLONG idx_n = 0; idx_n < n; idx_n++) {
                     xv = _mm256_set1_ps(x[idx_n]);
-                    ma7 = _mm256_maskz_loadu_ps(tail_mask, &a[idx_n * lda + tag_m_8x]);
+                    //ma7 = _mm256_maskz_loadu_ps(tail_mask, &a[idx_n * lda + tag_m_8x]);
+                    _VFMADD231_PS_MUL_ADDR(tail_mask, as7, xv, &a[idx_n * lda + tag_m_8x]);
     
-                    as7 = _mm256_maskz_fmadd_ps(tail_mask, ma7, xv, as7);
+                    //as7 = _mm256_maskz_fmadd_ps(tail_mask, ma7, xv, as7);
                 }
-    
-                _mm256_mask_storeu_ps(&y[tag_m_8x], tail_mask, _mm256_maskz_fmadd_ps(tail_mask, as7, alphav, _mm256_maskz_loadu_ps(tail_mask, &y[tag_m_8x])));
+                _VFMADD213_PS_ADD_ADDR(tail_mask, as7, alphav, &y[tag_m_8x]);
+                //_mm256_mask_storeu_ps(&y[tag_m_8x], tail_mask, _mm256_maskz_fmadd_ps(tail_mask, as7, alphav, _mm256_maskz_loadu_ps(tail_mask, &y[tag_m_8x])));
+                _mm256_mask_storeu_ps(&y[tag_m_8x], tail_mask, as7);
     
             }
         }
