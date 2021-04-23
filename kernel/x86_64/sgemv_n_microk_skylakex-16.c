@@ -31,10 +31,6 @@ USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define HAVE_SGEMV_N_SKYLAKE_KERNEL 1
 #include "common.h"
 #include <immintrin.h>
-#define _MM512_BROADCASTD_EPI32(addr, zmm)             \
-                    __asm__ ("vpbroadcastd (%1), %0;"  \
-                            : "=v" (zmm)               \
-                            : "r"  (addr) )
 
 #define _VFMADD231_PS_MUL_ADDR(kmask, ymm1, ymm2, addr)          \
                     __asm__ ("vfmadd231ps (%2), %1, %0;"  \
@@ -74,33 +70,32 @@ static int sgemv_kernel_n(BLASLONG m, BLASLONG n, float alpha, float *a, BLASLON
 
         for (BLASLONG idx_n = 0; idx_n < n; idx_n++) {
             xv = _mm256_set1_ps(x[idx_n]);
-            ma0 = _mm256_maskz_loadu_ps(one_mask, &a[idx_n * lda + idx_m +0]);
-            ma1 = _mm256_maskz_loadu_ps(one_mask, &a[idx_n * lda + idx_m +8]);
-            ma2 = _mm256_maskz_loadu_ps(one_mask, &a[idx_n * lda + idx_m +16]);
-            ma3 = _mm256_maskz_loadu_ps(one_mask, &a[idx_n * lda + idx_m +24]);
-            ma4 = _mm256_maskz_loadu_ps(one_mask, &a[idx_n * lda + idx_m +32]);
-            ma5 = _mm256_maskz_loadu_ps(one_mask, &a[idx_n * lda + idx_m +40]);
-            ma6 = _mm256_maskz_loadu_ps(one_mask, &a[idx_n * lda + idx_m +48]);
-            ma7 = _mm256_maskz_loadu_ps(one_mask, &a[idx_n * lda + idx_m +56]);
-
-            as0 = _mm256_maskz_fmadd_ps(one_mask, ma0, xv, as0);
-            as1 = _mm256_maskz_fmadd_ps(one_mask, ma1, xv, as1);
-            as2 = _mm256_maskz_fmadd_ps(one_mask, ma2, xv, as2);
-            as3 = _mm256_maskz_fmadd_ps(one_mask, ma3, xv, as3);
-            as4 = _mm256_maskz_fmadd_ps(one_mask, ma4, xv, as4);
-            as5 = _mm256_maskz_fmadd_ps(one_mask, ma5, xv, as5);
-            as6 = _mm256_maskz_fmadd_ps(one_mask, ma6, xv, as6);
-            as7 = _mm256_maskz_fmadd_ps(one_mask, ma7, xv, as7);
-                    
-        }
-        _mm256_mask_storeu_ps(&y[idx_m], one_mask, _mm256_maskz_fmadd_ps(one_mask, as0, alphav, _mm256_maskz_loadu_ps(one_mask, &y[idx_m])));
-        _mm256_mask_storeu_ps(&y[idx_m + 8], one_mask, _mm256_maskz_fmadd_ps(one_mask, as1, alphav, _mm256_maskz_loadu_ps(one_mask, &y[idx_m + 8])));
-        _mm256_mask_storeu_ps(&y[idx_m + 16], one_mask, _mm256_maskz_fmadd_ps(one_mask, as2, alphav, _mm256_maskz_loadu_ps(one_mask, &y[idx_m + 16])));
-        _mm256_mask_storeu_ps(&y[idx_m + 24], one_mask, _mm256_maskz_fmadd_ps(one_mask, as3, alphav, _mm256_maskz_loadu_ps(one_mask, &y[idx_m + 24])));
-        _mm256_mask_storeu_ps(&y[idx_m + 32], one_mask, _mm256_maskz_fmadd_ps(one_mask, as4, alphav, _mm256_maskz_loadu_ps(one_mask, &y[idx_m + 32])));
-        _mm256_mask_storeu_ps(&y[idx_m + 40], one_mask, _mm256_maskz_fmadd_ps(one_mask, as5, alphav, _mm256_maskz_loadu_ps(one_mask, &y[idx_m + 40])));
-        _mm256_mask_storeu_ps(&y[idx_m + 48], one_mask, _mm256_maskz_fmadd_ps(one_mask, as6, alphav, _mm256_maskz_loadu_ps(one_mask, &y[idx_m + 48])));
-        _mm256_mask_storeu_ps(&y[idx_m + 56], one_mask, _mm256_maskz_fmadd_ps(one_mask, as7, alphav, _mm256_maskz_loadu_ps(one_mask, &y[idx_m + 56])));
+           
+            _VFMADD231_PS_MUL_ADDR(one_mask, as0, xv, &a[idx_n * lda + idx_m]);
+            _VFMADD231_PS_MUL_ADDR(one_mask, as1, xv, &a[idx_n * lda + idx_m + 8]);
+            _VFMADD231_PS_MUL_ADDR(one_mask, as2, xv, &a[idx_n * lda + idx_m + 16]);
+            _VFMADD231_PS_MUL_ADDR(one_mask, as3, xv, &a[idx_n * lda + idx_m + 24]);
+            _VFMADD231_PS_MUL_ADDR(one_mask, as4, xv, &a[idx_n * lda + idx_m + 32]);
+            _VFMADD231_PS_MUL_ADDR(one_mask, as5, xv, &a[idx_n * lda + idx_m + 40]);
+            _VFMADD231_PS_MUL_ADDR(one_mask, as6, xv, &a[idx_n * lda + idx_m + 48]);
+            _VFMADD231_PS_MUL_ADDR(one_mask, as7, xv, &a[idx_n * lda + idx_m + 56]);
+       }
+        _VFMADD213_PS_ADD_ADDR(one_mask, as0, alphav, &y[idx_m]);
+        _VFMADD213_PS_ADD_ADDR(one_mask, as1, alphav, &y[idx_m + 8]);
+        _VFMADD213_PS_ADD_ADDR(one_mask, as2, alphav, &y[idx_m + 16]);
+        _VFMADD213_PS_ADD_ADDR(one_mask, as3, alphav, &y[idx_m + 24]);
+        _VFMADD213_PS_ADD_ADDR(one_mask, as4, alphav, &y[idx_m + 32]);
+        _VFMADD213_PS_ADD_ADDR(one_mask, as5, alphav, &y[idx_m + 40]);
+        _VFMADD213_PS_ADD_ADDR(one_mask, as6, alphav, &y[idx_m + 48]);
+        _VFMADD213_PS_ADD_ADDR(one_mask, as7, alphav, &y[idx_m + 56]);
+        _mm256_mask_storeu_ps(&y[idx_m], one_mask, as0);
+        _mm256_mask_storeu_ps(&y[idx_m + 8], one_mask, as1);
+        _mm256_mask_storeu_ps(&y[idx_m + 16], one_mask, as2);
+        _mm256_mask_storeu_ps(&y[idx_m + 24], one_mask, as3);
+        _mm256_mask_storeu_ps(&y[idx_m + 32], one_mask, as4);
+        _mm256_mask_storeu_ps(&y[idx_m + 40], one_mask, as5);
+        _mm256_mask_storeu_ps(&y[idx_m + 48], one_mask, as6);
+        _mm256_mask_storeu_ps(&y[idx_m+  56], one_mask, as7);
     }
 
     if (tag_m_64x != m){
@@ -113,20 +108,19 @@ static int sgemv_kernel_n(BLASLONG m, BLASLONG n, float alpha, float *a, BLASLON
 
         for (BLASLONG idx_n = 0; idx_n < n; idx_n++) {
             xv = _mm256_set1_ps(x[idx_n]);
-            ma0 = _mm256_maskz_loadu_ps(one_mask, &a[idx_n * lda + idx_m +0]);
-            ma1 = _mm256_maskz_loadu_ps(one_mask, &a[idx_n * lda + idx_m +8]);
-            ma2 = _mm256_maskz_loadu_ps(one_mask, &a[idx_n * lda + idx_m +16]);
-            ma3 = _mm256_maskz_loadu_ps(one_mask, &a[idx_n * lda + idx_m +24]);
-
-            as0 = _mm256_maskz_fmadd_ps(one_mask, ma0, xv, as0);
-            as1 = _mm256_maskz_fmadd_ps(one_mask, ma1, xv, as1);
-            as2 = _mm256_maskz_fmadd_ps(one_mask, ma2, xv, as2);
-            as3 = _mm256_maskz_fmadd_ps(one_mask, ma3, xv, as3);
+            _VFMADD231_PS_MUL_ADDR(one_mask, as0, xv, &a[idx_n * lda + idx_m]);
+            _VFMADD231_PS_MUL_ADDR(one_mask, as1, xv, &a[idx_n * lda + idx_m + 8]);
+            _VFMADD231_PS_MUL_ADDR(one_mask, as2, xv, &a[idx_n * lda + idx_m + 16]);
+            _VFMADD231_PS_MUL_ADDR(one_mask, as3, xv, &a[idx_n * lda + idx_m + 24]);
         }
-        _mm256_mask_storeu_ps(&y[idx_m], one_mask, _mm256_maskz_fmadd_ps(one_mask, as0, alphav, _mm256_maskz_loadu_ps(one_mask, &y[idx_m])));
-        _mm256_mask_storeu_ps(&y[idx_m + 8], one_mask, _mm256_maskz_fmadd_ps(one_mask, as1, alphav, _mm256_maskz_loadu_ps(one_mask, &y[idx_m + 8])));
-        _mm256_mask_storeu_ps(&y[idx_m + 16], one_mask, _mm256_maskz_fmadd_ps(one_mask, as2, alphav, _mm256_maskz_loadu_ps(one_mask, &y[idx_m + 16])));
-        _mm256_mask_storeu_ps(&y[idx_m + 24], one_mask, _mm256_maskz_fmadd_ps(one_mask, as3, alphav, _mm256_maskz_loadu_ps(one_mask, &y[idx_m + 24])));
+        _VFMADD213_PS_ADD_ADDR(one_mask, as0, alphav, &y[idx_m]);
+        _VFMADD213_PS_ADD_ADDR(one_mask, as1, alphav, &y[idx_m + 8]);
+        _VFMADD213_PS_ADD_ADDR(one_mask, as2, alphav, &y[idx_m + 16]);
+        _VFMADD213_PS_ADD_ADDR(one_mask, as3, alphav, &y[idx_m + 24]);
+        _mm256_mask_storeu_ps(&y[idx_m], one_mask, as0);
+        _mm256_mask_storeu_ps(&y[idx_m + 8], one_mask, as1);
+        _mm256_mask_storeu_ps(&y[idx_m + 16], one_mask, as2);
+        _mm256_mask_storeu_ps(&y[idx_m + 24], one_mask, as3);
  
     }    
  
@@ -137,14 +131,13 @@ static int sgemv_kernel_n(BLASLONG m, BLASLONG n, float alpha, float *a, BLASLON
     
             for (BLASLONG idx_n = 0; idx_n < n; idx_n++) {
                 xv = _mm256_set1_ps(x[idx_n]);
-                ma4 = _mm256_maskz_loadu_ps(one_mask, &a[idx_n * lda + idx_m +0]);
-                ma5 = _mm256_maskz_loadu_ps(one_mask, &a[idx_n * lda + idx_m +8]);
-    
-                as4 = _mm256_maskz_fmadd_ps(one_mask, ma4, xv, as4);
-                as5 = _mm256_maskz_fmadd_ps(one_mask, ma5, xv, as5);
+                _VFMADD231_PS_MUL_ADDR(one_mask, as4, xv, &a[idx_n * lda + idx_m]);
+                _VFMADD231_PS_MUL_ADDR(one_mask, as5, xv, &a[idx_n * lda + idx_m + 8]);    
             }
-            _mm256_mask_storeu_ps(&y[idx_m], one_mask, _mm256_maskz_fmadd_ps(one_mask, as4, alphav, _mm256_maskz_loadu_ps(one_mask, &y[idx_m])));
-            _mm256_mask_storeu_ps(&y[idx_m + 8], one_mask, _mm256_maskz_fmadd_ps(one_mask, as5, alphav, _mm256_maskz_loadu_ps(one_mask, &y[idx_m + 8])));
+            _VFMADD213_PS_ADD_ADDR(one_mask, as4, alphav, &y[idx_m]);
+            _VFMADD213_PS_ADD_ADDR(one_mask, as5, alphav, &y[idx_m + 8]);
+            _mm256_mask_storeu_ps(&y[idx_m], one_mask, as4);
+            _mm256_mask_storeu_ps(&y[idx_m + 8], one_mask, as5);
         }
     
         if (tag_m_16x != m ) {
@@ -154,11 +147,8 @@ static int sgemv_kernel_n(BLASLONG m, BLASLONG n, float alpha, float *a, BLASLON
     
                 for (BLASLONG idx_n = 0; idx_n < n; idx_n++) {
                     xv = _mm256_set1_ps(x[idx_n]);
-                    //ma6 = _mm256_maskz_loadu_ps(one_mask, &a[idx_n * lda + idx_m]);
                     _VFMADD231_PS_MUL_ADDR(one_mask, as6, xv, &a[idx_n * lda + idx_m]);
-                    //as6 = _mm256_maskz_fmadd_ps(one_mask, ma6, xv, as6);
                 }
-                //_mm256_mask_storeu_ps(&y[idx_m], one_mask, _mm256_maskz_fmadd_ps(one_mask, as6, alphav, _mm256_maskz_loadu_ps(one_mask, &y[idx_m])));
                 _VFMADD213_PS_ADD_ADDR(one_mask, as6, alphav, &y[idx_m]);
                 _mm256_mask_storeu_ps(&y[idx_m], one_mask, as6);
             }
@@ -172,13 +162,9 @@ static int sgemv_kernel_n(BLASLONG m, BLASLONG n, float alpha, float *a, BLASLON
     
                 for(BLASLONG idx_n = 0; idx_n < n; idx_n++) {
                     xv = _mm256_set1_ps(x[idx_n]);
-                    //ma7 = _mm256_maskz_loadu_ps(tail_mask, &a[idx_n * lda + tag_m_8x]);
                     _VFMADD231_PS_MUL_ADDR(tail_mask, as7, xv, &a[idx_n * lda + tag_m_8x]);
-    
-                    //as7 = _mm256_maskz_fmadd_ps(tail_mask, ma7, xv, as7);
                 }
                 _VFMADD213_PS_ADD_ADDR(tail_mask, as7, alphav, &y[tag_m_8x]);
-                //_mm256_mask_storeu_ps(&y[tag_m_8x], tail_mask, _mm256_maskz_fmadd_ps(tail_mask, as7, alphav, _mm256_maskz_loadu_ps(tail_mask, &y[tag_m_8x])));
                 _mm256_mask_storeu_ps(&y[tag_m_8x], tail_mask, as7);
     
             }
