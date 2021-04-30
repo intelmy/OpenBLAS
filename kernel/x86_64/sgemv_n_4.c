@@ -52,40 +52,40 @@ USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 static void sgemv_kernel_4x8(BLASLONG n, FLOAT **ap, FLOAT *xo, FLOAT *y, BLASLONG lda4, FLOAT *alpha)
 {
-	BLASLONG i;
-	FLOAT *a0,*a1,*a2,*a3;
-	FLOAT *b0,*b1,*b2,*b3;
-	FLOAT *x4;
-	FLOAT x[8];
-	a0 = ap[0];
-	a1 = ap[1];
-	a2 = ap[2];
-	a3 = ap[3];
-	b0 = a0 + lda4 ;
-	b1 = a1 + lda4 ;
-	b2 = a2 + lda4 ;
-	b3 = a3 + lda4 ;
-	x4 = x + 4;
+    BLASLONG i;
+    FLOAT *a0,*a1,*a2,*a3;
+    FLOAT *b0,*b1,*b2,*b3;
+    FLOAT *x4;
+    FLOAT x[8];
+    a0 = ap[0];
+    a1 = ap[1];
+    a2 = ap[2];
+    a3 = ap[3];
+    b0 = a0 + lda4 ;
+    b1 = a1 + lda4 ;
+    b2 = a2 + lda4 ;
+    b3 = a3 + lda4 ;
+    x4 = x + 4;
 
-	for ( i=0; i<8; i++)
-		x[i] = xo[i] * *alpha;
+    for ( i=0; i<8; i++)
+        x[i] = xo[i] * *alpha;
 
-	for ( i=0; i< n; i+=4 )
-	{
+    for ( i=0; i< n; i+=4 )
+    {
 
-		y[i] += a0[i]*x[0] + a1[i]*x[1] + a2[i]*x[2] + a3[i]*x[3];		
-		y[i+1] += a0[i+1]*x[0] + a1[i+1]*x[1] + a2[i+1]*x[2] + a3[i+1]*x[3];		
-		y[i+2] += a0[i+2]*x[0] + a1[i+2]*x[1] + a2[i+2]*x[2] + a3[i+2]*x[3];		
-		y[i+3] += a0[i+3]*x[0] + a1[i+3]*x[1] + a2[i+3]*x[2] + a3[i+3]*x[3];		
+        y[i] += a0[i]*x[0] + a1[i]*x[1] + a2[i]*x[2] + a3[i]*x[3];        
+        y[i+1] += a0[i+1]*x[0] + a1[i+1]*x[1] + a2[i+1]*x[2] + a3[i+1]*x[3];        
+        y[i+2] += a0[i+2]*x[0] + a1[i+2]*x[1] + a2[i+2]*x[2] + a3[i+2]*x[3];        
+        y[i+3] += a0[i+3]*x[0] + a1[i+3]*x[1] + a2[i+3]*x[2] + a3[i+3]*x[3];        
 
-		y[i] += b0[i]*x4[0] + b1[i]*x4[1] + b2[i]*x4[2] + b3[i]*x4[3];		
-		y[i+1] += b0[i+1]*x4[0] + b1[i+1]*x4[1] + b2[i+1]*x4[2] + b3[i+1]*x4[3];		
-		y[i+2] += b0[i+2]*x4[0] + b1[i+2]*x4[1] + b2[i+2]*x4[2] + b3[i+2]*x4[3];		
-		y[i+3] += b0[i+3]*x4[0] + b1[i+3]*x4[1] + b2[i+3]*x4[2] + b3[i+3]*x4[3];		
+        y[i] += b0[i]*x4[0] + b1[i]*x4[1] + b2[i]*x4[2] + b3[i]*x4[3];        
+        y[i+1] += b0[i+1]*x4[0] + b1[i+1]*x4[1] + b2[i+1]*x4[2] + b3[i+1]*x4[3];        
+        y[i+2] += b0[i+2]*x4[0] + b1[i+2]*x4[1] + b2[i+2]*x4[2] + b3[i+2]*x4[3];        
+        y[i+3] += b0[i+3]*x4[0] + b1[i+3]*x4[1] + b2[i+3]*x4[2] + b3[i+3]*x4[3];        
 
-	}
+    }
 }
-	
+    
 #endif
 
 
@@ -93,26 +93,26 @@ static void sgemv_kernel_4x8(BLASLONG n, FLOAT **ap, FLOAT *xo, FLOAT *y, BLASLO
 
 static void sgemv_kernel_4x4(BLASLONG n, FLOAT **ap, FLOAT *xo, FLOAT *y, FLOAT *alpha)
 {
-	BLASLONG i;
-	FLOAT *a0,*a1,*a2,*a3;
-	FLOAT x[4];
-	a0 = ap[0];
-	a1 = ap[1];
-	a2 = ap[2];
-	a3 = ap[3];
+    BLASLONG i;
+    FLOAT *a0,*a1,*a2,*a3;
+    FLOAT x[4];
+    a0 = ap[0];
+    a1 = ap[1];
+    a2 = ap[2];
+    a3 = ap[3];
 
-	for ( i=0; i<4; i++)
-		x[i] = xo[i] * *alpha;
+    for ( i=0; i<4; i++)
+        x[i] = xo[i] * *alpha;
 
-	for ( i=0; i< n; i+=4 )
-	{
-		y[i] += a0[i]*x[0] + a1[i]*x[1] + a2[i]*x[2] + a3[i]*x[3];		
-		y[i+1] += a0[i+1]*x[0] + a1[i+1]*x[1] + a2[i+1]*x[2] + a3[i+1]*x[3];		
-		y[i+2] += a0[i+2]*x[0] + a1[i+2]*x[1] + a2[i+2]*x[2] + a3[i+2]*x[3];		
-		y[i+3] += a0[i+3]*x[0] + a1[i+3]*x[1] + a2[i+3]*x[2] + a3[i+3]*x[3];		
-	}
+    for ( i=0; i< n; i+=4 )
+    {
+        y[i] += a0[i]*x[0] + a1[i]*x[1] + a2[i]*x[2] + a3[i]*x[3];        
+        y[i+1] += a0[i+1]*x[0] + a1[i+1]*x[1] + a2[i+1]*x[2] + a3[i+1]*x[3];        
+        y[i+2] += a0[i+2]*x[0] + a1[i+2]*x[1] + a2[i+2]*x[2] + a3[i+2]*x[3];        
+        y[i+3] += a0[i+3]*x[0] + a1[i+3]*x[1] + a2[i+3]*x[2] + a3[i+3]*x[3];        
+    }
 }
-	
+    
 #endif
 
 #ifndef HAVE_KERNEL_4x2
@@ -122,51 +122,51 @@ static void sgemv_kernel_4x2( BLASLONG n, FLOAT **ap, FLOAT *x, FLOAT *y, FLOAT 
 static void sgemv_kernel_4x2( BLASLONG n, FLOAT **ap, FLOAT *x, FLOAT *y, FLOAT *alpha)
 {
 
-	BLASLONG register i = 0;
+    BLASLONG register i = 0;
 
-	__asm__  __volatile__
-	(
-	"movss    (%2)  , %%xmm12	 \n\t"	// x0 
-	"movss    (%6)  , %%xmm4 	 \n\t"	// alpha 
-	"movss   4(%2)  , %%xmm13	 \n\t"	// x1 
+    __asm__  __volatile__
+    (
+    "movss    (%2)  , %%xmm12     \n\t"    // x0 
+    "movss    (%6)  , %%xmm4      \n\t"    // alpha 
+    "movss   4(%2)  , %%xmm13     \n\t"    // x1 
         "mulss  %%xmm4  , %%xmm12        \n\t"  // alpha 
         "mulss  %%xmm4  , %%xmm13        \n\t"  // alpha 
-	"shufps $0,  %%xmm12, %%xmm12    \n\t"	
-	"shufps $0,  %%xmm13, %%xmm13    \n\t"	
+    "shufps $0,  %%xmm12, %%xmm12    \n\t"    
+    "shufps $0,  %%xmm13, %%xmm13    \n\t"    
 
-	//	".align 16				       \n\t"
-	"1:				       \n\t"
-	"movups	       (%3,%0,4), %%xmm4	       \n\t"	// 4 * y
+    //    ".align 16                       \n\t"
+    "1:                       \n\t"
+    "movups           (%3,%0,4), %%xmm4           \n\t"    // 4 * y
 
-	"movups             (%4,%0,4), %%xmm8          \n\t" 
-	"movups             (%5,%0,4), %%xmm9          \n\t" 
-	"mulps		%%xmm12, %%xmm8		       \n\t"
-	"mulps		%%xmm13, %%xmm9		       \n\t"
-	"addps		%%xmm8 , %%xmm4		       \n\t"
-        "addq		$4 , %0	  	 	       \n\t"
-	"addps		%%xmm9 , %%xmm4		       \n\t"
+    "movups             (%4,%0,4), %%xmm8          \n\t" 
+    "movups             (%5,%0,4), %%xmm9          \n\t" 
+    "mulps        %%xmm12, %%xmm8               \n\t"
+    "mulps        %%xmm13, %%xmm9               \n\t"
+    "addps        %%xmm8 , %%xmm4               \n\t"
+        "addq        $4 , %0                      \n\t"
+    "addps        %%xmm9 , %%xmm4               \n\t"
 
-	"movups  %%xmm4 , -16(%3,%0,4)		       \n\t"	// 4 * y
+    "movups  %%xmm4 , -16(%3,%0,4)               \n\t"    // 4 * y
 
-	"subq	        $4 , %1			       \n\t"		
-	"jnz		1b		       \n\t"
+    "subq            $4 , %1                   \n\t"        
+    "jnz        1b               \n\t"
 
-	:
-          "+r" (i),	// 0	
-	  "+r" (n)  	// 1
-	:
+    :
+          "+r" (i),    // 0    
+      "+r" (n)      // 1
+    :
           "r" (x),      // 2
           "r" (y),      // 3
           "r" (ap[0]),  // 4
           "r" (ap[1]),  // 5
           "r" (alpha)   // 6
-	: "cc", 
-	  "%xmm4", "%xmm5", 
-	  "%xmm6", "%xmm7", 
-	  "%xmm8", "%xmm9", "%xmm10", "%xmm11",
-	  "%xmm12", "%xmm13", "%xmm14", "%xmm15",
-	  "memory"
-	);
+    : "cc", 
+      "%xmm4", "%xmm5", 
+      "%xmm6", "%xmm7", 
+      "%xmm8", "%xmm9", "%xmm10", "%xmm11",
+      "%xmm12", "%xmm13", "%xmm14", "%xmm15",
+      "memory"
+    );
 
 } 
 
@@ -180,8 +180,8 @@ static void sgemv_kernel_4x1(BLASLONG n, FLOAT *ap, FLOAT *x, FLOAT *y, FLOAT *a
 {
 
         BLASLONG register i = 0;
-	BLASLONG register n1 = n & -8 ;
-	BLASLONG register n2 = n & 4  ;
+    BLASLONG register n1 = n & -8 ;
+    BLASLONG register n2 = n & 4  ;
 
         __asm__  __volatile__
         (
@@ -192,20 +192,20 @@ static void sgemv_kernel_4x1(BLASLONG n, FLOAT *ap, FLOAT *x, FLOAT *y, FLOAT *a
         "cmpq           $0, %1                   \n\t"
         "je             2f                \n\t"
 
-	//        ".align 16                               \n\t"
+    //        ".align 16                               \n\t"
         "1:                             \n\t"
         "movups       (%3,%0,4), %%xmm4          \n\t"  // 4 * y
         "movups     16(%3,%0,4), %%xmm5          \n\t"  // 4 * y
         "movups       (%4,%0,4), %%xmm8          \n\t"  // 4 * a
         "movups     16(%4,%0,4), %%xmm9          \n\t"  // 4 * a
-	"mulps          %%xmm12, %%xmm8          \n\t"
-	"mulps          %%xmm12, %%xmm9          \n\t"
+    "mulps          %%xmm12, %%xmm8          \n\t"
+    "mulps          %%xmm12, %%xmm9          \n\t"
         "addps          %%xmm4 , %%xmm8          \n\t"
         "addps          %%xmm5 , %%xmm9          \n\t"
 
         "addq           $8 , %0                  \n\t"
-	"movups  %%xmm8 , -32(%3,%0,4)           \n\t"    // 4 * y
-	"movups  %%xmm9 , -16(%3,%0,4)           \n\t"    // 4 * y
+    "movups  %%xmm8 , -32(%3,%0,4)           \n\t"    // 4 * y
+    "movups  %%xmm9 , -16(%3,%0,4)           \n\t"    // 4 * y
 
         "subq           $8 , %1                  \n\t"
 
@@ -218,13 +218,13 @@ static void sgemv_kernel_4x1(BLASLONG n, FLOAT *ap, FLOAT *x, FLOAT *y, FLOAT *a
 
         "movups       (%3,%0,4), %%xmm4          \n\t"  // 4 * y
         "movups       (%4,%0,4), %%xmm8          \n\t"  // 4 * a
-	"mulps          %%xmm12, %%xmm8          \n\t"
+    "mulps          %%xmm12, %%xmm8          \n\t"
         "addps          %%xmm8 , %%xmm4          \n\t"
-	"movups  %%xmm4 ,    (%3,%0,4)           \n\t"    // 4 * y
+    "movups  %%xmm4 ,    (%3,%0,4)           \n\t"    // 4 * y
         "addq           $4 , %0                  \n\t"
         "subq           $4 , %1                  \n\t"
 
-        "3:      			 \n\t" 
+        "3:                   \n\t" 
         :
           "+r" (i),     // 0    
           "+r" (n1)     // 1
@@ -250,24 +250,24 @@ static void add_y(BLASLONG n, FLOAT *src, FLOAT *dest, BLASLONG inc_dest) __attr
 
 static void add_y(BLASLONG n, FLOAT *src, FLOAT *dest, BLASLONG inc_dest)
 {
-	BLASLONG i;
-	if ( inc_dest != 1 )
-	{
-		for ( i=0; i<n; i++ )
-		{
-			*dest += *src;
-			src++;
-			dest += inc_dest;
-		}
-		return;
-	}
+    BLASLONG i;
+    if ( inc_dest != 1 )
+    {
+        for ( i=0; i<n; i++ )
+        {
+            *dest += *src;
+            src++;
+            dest += inc_dest;
+        }
+        return;
+    }
 
         i=0;
 
         __asm__  __volatile__
         (
 
-	 //        ".align 16                              \n\t"
+     //        ".align 16                              \n\t"
         "1:                            \n\t"
 
         "movups  (%2,%0,4) , %%xmm12            \n\t"
@@ -294,337 +294,337 @@ static void add_y(BLASLONG n, FLOAT *src, FLOAT *dest, BLASLONG inc_dest)
 
 int CNAME(BLASLONG m, BLASLONG n, BLASLONG dummy1, FLOAT alpha, FLOAT *a, BLASLONG lda, FLOAT *x, BLASLONG inc_x, FLOAT *y, BLASLONG inc_y, FLOAT *buffer)
 {
-	if ( m < 1 || n < 1) return(0);
+    if ( m < 1 || n < 1) return(0);
 
-	#ifdef HAVE_SGEMV_N_SKYLAKE_KERNEL
+    #ifdef HAVE_SGEMV_N_SKYLAKE_KERNEL
     if (m <= 16384 && n <= 48 && !(n == 4))
     {
         FLOAT * xbuffer_align = x;
-		FLOAT * ybuffer_align = y;
-	
-		FLOAT * xbuffer = NULL;
-		FLOAT * ybuffer = NULL;
+        FLOAT * ybuffer_align = y;
+    
+        FLOAT * xbuffer = NULL;
+        FLOAT * ybuffer = NULL;
 
-		if (inc_x != 1) {
-			xbuffer_align = buffer;
-			for(BLASLONG i=0; i<n; i++) {
-		     	xbuffer_align[i] = x[i*inc_x];
-			}
-		}
+        if (inc_x != 1) {
+            xbuffer_align = buffer;
+            for(BLASLONG i=0; i<n; i++) {
+                 xbuffer_align[i] = x[i*inc_x];
+            }
+        }
 
-		if (inc_y != 1) {
-			ybuffer_align = buffer + n;
-			for(BLASLONG i=0; i<m; i++) {
-        		ybuffer_align[i] = y[i*inc_y];
-    		}
-		}
+        if (inc_y != 1) {
+            ybuffer_align = buffer + n;
+            for(BLASLONG i=0; i<m; i++) {
+                ybuffer_align[i] = y[i*inc_y];
+            }
+        }
         sgemv_kernel_n_128(m, n , alpha, a, lda, xbuffer_align, ybuffer_align);
 
-		if(inc_y != 1) {
-			for(BLASLONG i=0; i<m; i++) {
-   		    	y[i*inc_y] = ybuffer_align[i];
-    		}
-		}
+        if(inc_y != 1) {
+            for(BLASLONG i=0; i<m; i++) {
+                   y[i*inc_y] = ybuffer_align[i];
+            }
+        }
         return(0);
     }
 
     #endif
-	BLASLONG i;
-	FLOAT *a_ptr;
-	FLOAT *x_ptr;
-	FLOAT *y_ptr;
-	FLOAT *ap[4];
-	BLASLONG n1;
-	BLASLONG m1;
-	BLASLONG m2;
-	BLASLONG m3;
-	BLASLONG n2;
-	BLASLONG lda4 =  lda << 2;
-	BLASLONG lda8 =  lda << 3;
-	FLOAT xbuffer[8],*ybuffer;
+    BLASLONG i;
+    FLOAT *a_ptr;
+    FLOAT *x_ptr;
+    FLOAT *y_ptr;
+    FLOAT *ap[4];
+    BLASLONG n1;
+    BLASLONG m1;
+    BLASLONG m2;
+    BLASLONG m3;
+    BLASLONG n2;
+    BLASLONG lda4 =  lda << 2;
+    BLASLONG lda8 =  lda << 3;
+    FLOAT xbuffer[8],*ybuffer;
 
-	ybuffer = buffer;
-	
+    ybuffer = buffer;
+    
     if ( inc_x == 1 )
-	{
-		n1 = n >> 3 ;
-		n2 = n &  7 ;
-	}
-	else
-	{
-		n1 = n >> 2 ;
-		n2 = n &  3 ;
+    {
+        n1 = n >> 3 ;
+        n2 = n &  7 ;
+    }
+    else
+    {
+        n1 = n >> 2 ;
+        n2 = n &  3 ;
 
-	}
-	
+    }
+    
     m3 = m & 3  ;
     m1 = m & -4 ;
     m2 = (m & (NBMAX-1)) - m3 ;
 
 
-	y_ptr = y;
+    y_ptr = y;
 
-	BLASLONG NB = NBMAX;
+    BLASLONG NB = NBMAX;
 
-	while ( NB == NBMAX )
-	{
-		
-		m1 -= NB;
-		if ( m1 < 0)
-		{
-			if ( m2 == 0 ) break;	
-			NB = m2;
-		}
-		
-		a_ptr = a;
-		x_ptr = x;
-		
-		ap[0] = a_ptr;
-		ap[1] = a_ptr + lda;
-		ap[2] = ap[1] + lda;
-		ap[3] = ap[2] + lda;
+    while ( NB == NBMAX )
+    {
+        
+        m1 -= NB;
+        if ( m1 < 0)
+        {
+            if ( m2 == 0 ) break;    
+            NB = m2;
+        }
+        
+        a_ptr = a;
+        x_ptr = x;
+        
+        ap[0] = a_ptr;
+        ap[1] = a_ptr + lda;
+        ap[2] = ap[1] + lda;
+        ap[3] = ap[2] + lda;
 
-		if ( inc_y != 1 )
-			memset(ybuffer,0,NB*4);
-		else
-			ybuffer = y_ptr;
+        if ( inc_y != 1 )
+            memset(ybuffer,0,NB*4);
+        else
+            ybuffer = y_ptr;
 
-		if ( inc_x == 1 )
-		{
-
-
-			for( i = 0; i < n1 ; i++)
-			{
-				sgemv_kernel_4x8(NB,ap,x_ptr,ybuffer,lda4,&alpha);
-				ap[0] += lda8; 
-				ap[1] += lda8; 
-				ap[2] += lda8; 
-				ap[3] += lda8; 
-				a_ptr += lda8;
-				x_ptr += 8;	
-			}
+        if ( inc_x == 1 )
+        {
 
 
-			if ( n2 & 4 )
-			{
-				sgemv_kernel_4x4(NB,ap,x_ptr,ybuffer,&alpha);
-				ap[0] += lda4; 
-				ap[1] += lda4; 
-				ap[2] += lda4; 
-				ap[3] += lda4; 
-				a_ptr += lda4;
-				x_ptr += 4;	
-			}
-
-			if ( n2 & 2 )
-			{
-				sgemv_kernel_n_64(NB, 2, alpha, a_ptr, lda, x_ptr, ybuffer);
-				a_ptr += lda*2;
-				x_ptr += 2;	
-			}
+            for( i = 0; i < n1 ; i++)
+            {
+                sgemv_kernel_4x8(NB,ap,x_ptr,ybuffer,lda4,&alpha);
+                ap[0] += lda8; 
+                ap[1] += lda8; 
+                ap[2] += lda8; 
+                ap[3] += lda8; 
+                a_ptr += lda8;
+                x_ptr += 8;    
+            }
 
 
-			if ( n2 & 1 )
-			{
-				sgemv_kernel_n_64(NB, 1, alpha, a_ptr, lda, x_ptr, ybuffer);
-				/* a_ptr += lda;
-				x_ptr += 1a; */
+            if ( n2 & 4 )
+            {
+                sgemv_kernel_4x4(NB,ap,x_ptr,ybuffer,&alpha);
+                ap[0] += lda4; 
+                ap[1] += lda4; 
+                ap[2] += lda4; 
+                ap[3] += lda4; 
+                a_ptr += lda4;
+                x_ptr += 4;    
+            }
 
-			}
-
-
-		}
-		else
-		{
-
-			for( i = 0; i < n1 ; i++)
-			{
-				xbuffer[0] = x_ptr[0];
-				x_ptr += inc_x;	
-				xbuffer[1] =  x_ptr[0];
-				x_ptr += inc_x;	
-				xbuffer[2] =  x_ptr[0];
-				x_ptr += inc_x;	
-				xbuffer[3] = x_ptr[0];
-				x_ptr += inc_x;	
-				sgemv_kernel_4x4(NB,ap,xbuffer,ybuffer,&alpha);
-				ap[0] += lda4; 
-				ap[1] += lda4; 
-				ap[2] += lda4; 
-				ap[3] += lda4; 
-				a_ptr += lda4;
-			}
-
-			for( i = 0; i < n2 ; i++)
-			{
-				xbuffer[0] = x_ptr[0];
-				x_ptr += inc_x;	
-				sgemv_kernel_4x1(NB,a_ptr,xbuffer,ybuffer,&alpha);
-				a_ptr += lda;
-
-			}
-
-		}
-
-		a     += NB;
-		if ( inc_y != 1 )
-		{
-			add_y(NB,ybuffer,y_ptr,inc_y);
-			y_ptr += NB * inc_y;
-		}
-		else
-			y_ptr += NB ;
-
-	}
-
-	if ( m3 == 0 ) return(0);
-
-	if ( m3 == 3 )
-	{
-		a_ptr = a;
-		x_ptr = x;
-		FLOAT temp0 = 0.0;
-		FLOAT temp1 = 0.0;
-		FLOAT temp2 = 0.0;
-		if ( lda == 3 && inc_x ==1 )
-		{
-
-			for( i = 0; i < ( n & -4 ); i+=4 )
-			{
-
-				temp0 += a_ptr[0] * x_ptr[0] + a_ptr[3] * x_ptr[1];
-				temp1 += a_ptr[1] * x_ptr[0] + a_ptr[4] * x_ptr[1];
-				temp2 += a_ptr[2] * x_ptr[0] + a_ptr[5] * x_ptr[1];
-
-				temp0 += a_ptr[6] * x_ptr[2] + a_ptr[9]  * x_ptr[3];
-				temp1 += a_ptr[7] * x_ptr[2] + a_ptr[10] * x_ptr[3];
-				temp2 += a_ptr[8] * x_ptr[2] + a_ptr[11] * x_ptr[3];
-
-				a_ptr += 12;
-				x_ptr += 4;
-			}
-
-			for( ; i < n; i++ )
-			{
-				temp0 += a_ptr[0] * x_ptr[0];
-				temp1 += a_ptr[1] * x_ptr[0];
-				temp2 += a_ptr[2] * x_ptr[0];
-				a_ptr += 3;
-				x_ptr ++;
-			}
-
-		}
-		else
-		{
-
-			for( i = 0; i < n; i++ )
-			{
-				temp0 += a_ptr[0] * x_ptr[0];
-				temp1 += a_ptr[1] * x_ptr[0];
-				temp2 += a_ptr[2] * x_ptr[0];
-				a_ptr += lda;
-				x_ptr += inc_x;
+            if ( n2 & 2 )
+            {
+                sgemv_kernel_n_64(NB, 2, alpha, a_ptr, lda, x_ptr, ybuffer);
+                a_ptr += lda*2;
+                x_ptr += 2;    
+            }
 
 
-			}
+            if ( n2 & 1 )
+            {
+                sgemv_kernel_n_64(NB, 1, alpha, a_ptr, lda, x_ptr, ybuffer);
+                /* a_ptr += lda;
+                x_ptr += 1a; */
 
-		}
-		y_ptr[0] += alpha * temp0;
-		y_ptr += inc_y;
-		y_ptr[0] += alpha * temp1;
-		y_ptr += inc_y;
-		y_ptr[0] += alpha * temp2;
-		return(0);
-	}
+            }
 
 
-	if ( m3 == 2 )
-	{
-		a_ptr = a;
-		x_ptr = x;
-		FLOAT temp0 = 0.0;
-		FLOAT temp1 = 0.0;
-		if ( lda == 2 && inc_x ==1 )
-		{
+        }
+        else
+        {
 
-			for( i = 0; i < (n & -4) ; i+=4 )
-			{
-				temp0 += a_ptr[0] * x_ptr[0] + a_ptr[2] * x_ptr[1];
-				temp1 += a_ptr[1] * x_ptr[0] + a_ptr[3] * x_ptr[1];
-				temp0 += a_ptr[4] * x_ptr[2] + a_ptr[6] * x_ptr[3];
-				temp1 += a_ptr[5] * x_ptr[2] + a_ptr[7] * x_ptr[3];
-				a_ptr += 8;
-				x_ptr += 4;
+            for( i = 0; i < n1 ; i++)
+            {
+                xbuffer[0] = x_ptr[0];
+                x_ptr += inc_x;    
+                xbuffer[1] =  x_ptr[0];
+                x_ptr += inc_x;    
+                xbuffer[2] =  x_ptr[0];
+                x_ptr += inc_x;    
+                xbuffer[3] = x_ptr[0];
+                x_ptr += inc_x;    
+                sgemv_kernel_4x4(NB,ap,xbuffer,ybuffer,&alpha);
+                ap[0] += lda4; 
+                ap[1] += lda4; 
+                ap[2] += lda4; 
+                ap[3] += lda4; 
+                a_ptr += lda4;
+            }
 
-			}
+            for( i = 0; i < n2 ; i++)
+            {
+                xbuffer[0] = x_ptr[0];
+                x_ptr += inc_x;    
+                sgemv_kernel_4x1(NB,a_ptr,xbuffer,ybuffer,&alpha);
+                a_ptr += lda;
+
+            }
+
+        }
+
+        a     += NB;
+        if ( inc_y != 1 )
+        {
+            add_y(NB,ybuffer,y_ptr,inc_y);
+            y_ptr += NB * inc_y;
+        }
+        else
+            y_ptr += NB ;
+
+    }
+
+    if ( m3 == 0 ) return(0);
+
+    if ( m3 == 3 )
+    {
+        a_ptr = a;
+        x_ptr = x;
+        FLOAT temp0 = 0.0;
+        FLOAT temp1 = 0.0;
+        FLOAT temp2 = 0.0;
+        if ( lda == 3 && inc_x ==1 )
+        {
+
+            for( i = 0; i < ( n & -4 ); i+=4 )
+            {
+
+                temp0 += a_ptr[0] * x_ptr[0] + a_ptr[3] * x_ptr[1];
+                temp1 += a_ptr[1] * x_ptr[0] + a_ptr[4] * x_ptr[1];
+                temp2 += a_ptr[2] * x_ptr[0] + a_ptr[5] * x_ptr[1];
+
+                temp0 += a_ptr[6] * x_ptr[2] + a_ptr[9]  * x_ptr[3];
+                temp1 += a_ptr[7] * x_ptr[2] + a_ptr[10] * x_ptr[3];
+                temp2 += a_ptr[8] * x_ptr[2] + a_ptr[11] * x_ptr[3];
+
+                a_ptr += 12;
+                x_ptr += 4;
+            }
+
+            for( ; i < n; i++ )
+            {
+                temp0 += a_ptr[0] * x_ptr[0];
+                temp1 += a_ptr[1] * x_ptr[0];
+                temp2 += a_ptr[2] * x_ptr[0];
+                a_ptr += 3;
+                x_ptr ++;
+            }
+
+        }
+        else
+        {
+
+            for( i = 0; i < n; i++ )
+            {
+                temp0 += a_ptr[0] * x_ptr[0];
+                temp1 += a_ptr[1] * x_ptr[0];
+                temp2 += a_ptr[2] * x_ptr[0];
+                a_ptr += lda;
+                x_ptr += inc_x;
 
 
-			for( ; i < n; i++ )
-			{
-				temp0 += a_ptr[0]   * x_ptr[0];
-				temp1 += a_ptr[1]   * x_ptr[0];
-				a_ptr += 2;
-				x_ptr ++;
-			}
+            }
 
-		}
-		else
-		{
-
-			for( i = 0; i < n; i++ )
-			{
-				temp0 += a_ptr[0] * x_ptr[0];
-				temp1 += a_ptr[1] * x_ptr[0];
-				a_ptr += lda;
-				x_ptr += inc_x;
+        }
+        y_ptr[0] += alpha * temp0;
+        y_ptr += inc_y;
+        y_ptr[0] += alpha * temp1;
+        y_ptr += inc_y;
+        y_ptr[0] += alpha * temp2;
+        return(0);
+    }
 
 
-			}
+    if ( m3 == 2 )
+    {
+        a_ptr = a;
+        x_ptr = x;
+        FLOAT temp0 = 0.0;
+        FLOAT temp1 = 0.0;
+        if ( lda == 2 && inc_x ==1 )
+        {
 
-		}
-		y_ptr[0] += alpha * temp0;
-		y_ptr += inc_y;
-		y_ptr[0] += alpha * temp1;
-		return(0);
-	}
+            for( i = 0; i < (n & -4) ; i+=4 )
+            {
+                temp0 += a_ptr[0] * x_ptr[0] + a_ptr[2] * x_ptr[1];
+                temp1 += a_ptr[1] * x_ptr[0] + a_ptr[3] * x_ptr[1];
+                temp0 += a_ptr[4] * x_ptr[2] + a_ptr[6] * x_ptr[3];
+                temp1 += a_ptr[5] * x_ptr[2] + a_ptr[7] * x_ptr[3];
+                a_ptr += 8;
+                x_ptr += 4;
 
-	if ( m3 == 1 )
-	{
-		a_ptr = a;
-		x_ptr = x;
-		FLOAT temp = 0.0;
-		if ( lda == 1 && inc_x ==1 )
-		{
-
-			for( i = 0; i < (n & -4); i+=4 )
-			{
-				temp += a_ptr[i] * x_ptr[i] + a_ptr[i+1] * x_ptr[i+1] + a_ptr[i+2] * x_ptr[i+2] + a_ptr[i+3] * x_ptr[i+3];
-	
-			}
-
-			for( ; i < n; i++ )
-			{
-				temp += a_ptr[i] * x_ptr[i];
-			}
-
-		}
-		else
-		{
-
-			for( i = 0; i < n; i++ )
-			{
-				temp += a_ptr[0] * x_ptr[0];
-				a_ptr += lda;
-				x_ptr += inc_x;
-			}
-
-		}
-		y_ptr[0] += alpha * temp;
-		return(0);
-	}
+            }
 
 
-	return(0);
+            for( ; i < n; i++ )
+            {
+                temp0 += a_ptr[0]   * x_ptr[0];
+                temp1 += a_ptr[1]   * x_ptr[0];
+                a_ptr += 2;
+                x_ptr ++;
+            }
+
+        }
+        else
+        {
+
+            for( i = 0; i < n; i++ )
+            {
+                temp0 += a_ptr[0] * x_ptr[0];
+                temp1 += a_ptr[1] * x_ptr[0];
+                a_ptr += lda;
+                x_ptr += inc_x;
+
+
+            }
+
+        }
+        y_ptr[0] += alpha * temp0;
+        y_ptr += inc_y;
+        y_ptr[0] += alpha * temp1;
+        return(0);
+    }
+
+    if ( m3 == 1 )
+    {
+        a_ptr = a;
+        x_ptr = x;
+        FLOAT temp = 0.0;
+        if ( lda == 1 && inc_x ==1 )
+        {
+
+            for( i = 0; i < (n & -4); i+=4 )
+            {
+                temp += a_ptr[i] * x_ptr[i] + a_ptr[i+1] * x_ptr[i+1] + a_ptr[i+2] * x_ptr[i+2] + a_ptr[i+3] * x_ptr[i+3];
+    
+            }
+
+            for( ; i < n; i++ )
+            {
+                temp += a_ptr[i] * x_ptr[i];
+            }
+
+        }
+        else
+        {
+
+            for( i = 0; i < n; i++ )
+            {
+                temp += a_ptr[0] * x_ptr[0];
+                a_ptr += lda;
+                x_ptr += inc_x;
+            }
+
+        }
+        y_ptr[0] += alpha * temp;
+        return(0);
+    }
+
+
+    return(0);
 }
 
 
