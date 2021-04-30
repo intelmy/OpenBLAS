@@ -345,7 +345,7 @@ int CNAME(BLASLONG m, BLASLONG n, BLASLONG dummy1, FLOAT alpha, FLOAT *a, BLASLO
 
 	ybuffer = buffer;
 	
-        if ( inc_x == 1 )
+    if ( inc_x == 1 )
 	{
 		n1 = n >> 3 ;
 		n2 = n &  7 ;
@@ -357,9 +357,9 @@ int CNAME(BLASLONG m, BLASLONG n, BLASLONG dummy1, FLOAT alpha, FLOAT *a, BLASLO
 
 	}
 	
-        m3 = m & 3  ;
-        m1 = m & -4 ;
-        m2 = (m & (NBMAX-1)) - m3 ;
+    m3 = m & 3  ;
+    m1 = m & -4 ;
+    m2 = (m & (NBMAX-1)) - m3 ;
 
 
 	y_ptr = y;
